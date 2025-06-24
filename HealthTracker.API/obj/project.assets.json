@@ -5166,11 +5166,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Fidan\\Desktop\\Yeni klasör\\HealthTracker.API\\HealthTracker.API.csproj",
+      "projectUniqueName": "C:\\Users\\Fidan\\Desktop\\internet_programlama_git\\HealthTracker.API\\HealthTracker.API.csproj",
       "projectName": "HealthTracker.API",
-      "projectPath": "C:\\Users\\Fidan\\Desktop\\Yeni klasör\\HealthTracker.API\\HealthTracker.API.csproj",
+      "projectPath": "C:\\Users\\Fidan\\Desktop\\internet_programlama_git\\HealthTracker.API\\HealthTracker.API.csproj",
       "packagesPath": "C:\\Users\\Fidan\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Fidan\\Desktop\\Yeni klasör\\HealthTracker.API\\obj\\",
+      "outputPath": "C:\\Users\\Fidan\\Desktop\\internet_programlama_git\\HealthTracker.API\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "2yyAkXRkcIg=",
+  "dgSpecHash": "DrW4Ga7KZWk=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Fidan\\Desktop\\Yeni klasör\\HealthTracker.API\\HealthTracker.API.csproj",
+  "projectFilePath": "C:\\Users\\Fidan\\Desktop\\internet_programlama_git\\HealthTracker.API\\HealthTracker.API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Fidan\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\Fidan\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",
