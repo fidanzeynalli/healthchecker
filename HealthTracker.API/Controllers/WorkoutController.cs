@@ -1,12 +1,14 @@
-using Microsoft.AspNetCore.Mvc;
 using HealthTracker.API.Data;
 using HealthTracker.API.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace HealthTracker.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class WorkoutController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -79,5 +81,6 @@ namespace HealthTracker.API.Controllers
             await _context.SaveChangesAsync();
             return NoContent();
         }
+
     }
 }

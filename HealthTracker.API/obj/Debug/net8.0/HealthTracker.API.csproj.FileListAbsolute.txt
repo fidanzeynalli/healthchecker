@@ -341,6 +341,7 @@ C:\Users\Fidan\Desktop\internet_programlama_git\HealthTracker.API\bin\Debug\net8
 C:\Users\Fidan\Desktop\internet_programlama_git\HealthTracker.API\bin\Debug\net8.0\Azure.Core.dll
 C:\Users\Fidan\Desktop\internet_programlama_git\HealthTracker.API\bin\Debug\net8.0\Azure.Identity.dll
 C:\Users\Fidan\Desktop\internet_programlama_git\HealthTracker.API\bin\Debug\net8.0\Humanizer.dll
+C:\Users\Fidan\Desktop\internet_programlama_git\HealthTracker.API\bin\Debug\net8.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
 C:\Users\Fidan\Desktop\internet_programlama_git\HealthTracker.API\bin\Debug\net8.0\Microsoft.Bcl.AsyncInterfaces.dll
 C:\Users\Fidan\Desktop\internet_programlama_git\HealthTracker.API\bin\Debug\net8.0\Microsoft.Build.Locator.dll
 C:\Users\Fidan\Desktop\internet_programlama_git\HealthTracker.API\bin\Debug\net8.0\Microsoft.CodeAnalysis.dll
@@ -496,3 +497,4 @@ C:\Users\Fidan\Desktop\internet_programlama_git\HealthTracker.API\obj\Debug\net8
 C:\Users\Fidan\Desktop\internet_programlama_git\HealthTracker.API\obj\Debug\net8.0\HealthTracker.API.pdb
 C:\Users\Fidan\Desktop\internet_programlama_git\HealthTracker.API\obj\Debug\net8.0\HealthTracker.API.genruntimeconfig.cache
 C:\Users\Fidan\Desktop\internet_programlama_git\HealthTracker.API\obj\Debug\net8.0\ref\HealthTracker.API.dll
+C:\Users\Fidan\Desktop\internet_programlama_git\HealthTracker.API\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
