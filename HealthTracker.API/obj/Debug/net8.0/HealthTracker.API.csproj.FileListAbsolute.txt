@@ -498,3 +498,5 @@ C:\Users\Fidan\Desktop\internet_programlama_git\HealthTracker.API\obj\Debug\net8
 C:\Users\Fidan\Desktop\internet_programlama_git\HealthTracker.API\obj\Debug\net8.0\HealthTracker.API.genruntimeconfig.cache
 C:\Users\Fidan\Desktop\internet_programlama_git\HealthTracker.API\obj\Debug\net8.0\ref\HealthTracker.API.dll
 C:\Users\Fidan\Desktop\internet_programlama_git\HealthTracker.API\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\Fidan\Desktop\internet_programlama_git\HealthTracker.API\bin\Debug\net8.0\package-lock.json
+C:\Users\Fidan\Desktop\internet_programlama_git\HealthTracker.API\bin\Debug\net8.0\package.json

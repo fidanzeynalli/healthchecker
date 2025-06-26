@@ -31,9 +31,12 @@ namespace HealthTracker.API.Controllers
         {
             var user = new ApplicationUser
             {
-                UserName = dto.Email,
+                UserName = dto.UserName,
                 Email = dto.Email,
-                FullName = dto.FullName
+                FullName = dto.FullName,
+                Height = dto.Height,
+                Weight = dto.Weight,
+                BodyFat = dto.BodyFat
             };
             var result = await _userMgr.CreateAsync(user, dto.Password);
             if (!result.Succeeded)
@@ -76,18 +79,22 @@ namespace HealthTracker.API.Controllers
 
             return Ok(new
             {
-                Token = new JwtSecurityTokenHandler().WriteToken(token),
-                Expiry = expires
+                token = new JwtSecurityTokenHandler().WriteToken(token),
+                expiry = expires
             });
         }
     }
 
-    // DTO’lar
+    // DTO'lar
     public class RegisterDto
     {
         public string FullName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
+        public string UserName { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
+        public double? Height { get; set; }
+        public double? Weight { get; set; }
+        public double? BodyFat { get; set; }
     }
 
     public class LoginDto

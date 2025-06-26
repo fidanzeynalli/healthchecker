@@ -19,5 +19,10 @@ namespace HealthTracker.API.Data
         // İleride diğer modelleriniz...
         public DbSet<Sleep> Sleeps { get; set; } // Sleep tablosu eklendi
         public DbSet<Step> Steps { get; set; } // Step tablosu eklendi
+        // Yeni eklenenler:
+        public DbSet<FoodItem> FoodItems { get; set; }
+        public DbSet<Meal> Meals { get; set; }
+        public DbSet<MealItem> MealItems { get; set; }
+        public DbSet<Exercise> Exercises { get; set; }
     }
 }
