@@ -6,7 +6,8 @@ namespace HealthTracker.API.Models
 {
     public class MealItem
     {
-        public int Id { get; set; }
+        [Key]
+        public int MealItemId { get; set; }
         [Required]
         public int MealId { get; set; }
         [ForeignKey("MealId")]
@@ -15,6 +16,7 @@ namespace HealthTracker.API.Models
         public int FoodItemId { get; set; }
         [ForeignKey("FoodItemId")]
         public FoodItem FoodItem { get; set; } = null!;
-        public double Quantity { get; set; } // Porsiyon/miktar
+        public double Quantity { get; set; } // Kullanıcı girdiği miktar
+        public double ServingMultiplier { get; set; } // 1 porsiyon, 0.5 porsiyon vb.
     }
 } 

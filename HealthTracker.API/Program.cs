@@ -21,14 +21,15 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
     options.Password.RequireDigit = true;
     options.Password.RequireUppercase = true;
     options.Password.RequiredLength = 6;
-    // Diðer identity ayarlarý...
+    // DiÄŸer identity ayarlarÄ±...
     })
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
-// 2) JWT Ayarlarýný Oku
-    var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-    var key = Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]!);
+// 2) JWT AyarlarÄ±nÄ± Oku
+var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+Console.WriteLine("JWT SecretKey: " + jwtSettings["SecretKey"]);
+var key = Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]!);
 
 // 3) Authentication & JWT Bearer
     builder.Services.AddAuthentication(options =>
@@ -52,11 +53,18 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
         };
     });
 
-// 4) CORS (isteðe baðlý, frontend’in eriþimi için)
-builder.Services.AddCors(opt =>
-    opt.AddPolicy("AllowAll", policy => policy.AllowAnyOrigin().AllowAnyHeader() .AllowAnyMethod() ));
+// 4) CORS (isteÄŸe baÄŸlÄ±, frontend'in eriÅŸimi iÃ§in)
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        policy => policy
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+    );
+});
 
-// 5) Controller’larý ekle, Swagger…
+// 5) ControllerlarÄ± ekle, Swagger
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
@@ -64,7 +72,7 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "HealthTracker.API", Version = "v1" });
 
-    // 1. JWT Bearer güvenlik tanýmý
+    // 1. JWT Bearer gÃ¼venlik tanÄ±mÄ±
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -72,10 +80,10 @@ builder.Services.AddSwaggerGen(c =>
         Scheme = "Bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "Lütfen 'Bearer {token}' formatýnda JWT girin."
+        Description = "LÃ¼tfen 'Bearer {token}' formatÄ±nda JWT girin."
     });
 
-    // 2. Global güvenlik gereksinimi
+    // 2. Global gÃ¼venlik gereksinimi
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -92,17 +100,20 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+builder.Services.AddScoped<HealthTracker.API.Services.IFoodService, HealthTracker.API.Services.FoodService>();
+builder.Services.AddScoped<HealthTracker.API.Services.IMealService, HealthTracker.API.Services.MealService>();
+builder.Services.AddScoped<HealthTracker.API.Services.IWaterService, HealthTracker.API.Services.WaterService>();
 
 var app = builder.Build();
-// **SADECE GELÝÞTÝRME ORTAMINDA** Swagger’ý aç
+// **SADECE GELÄ°ÅžTÄ°RME ORTAMINDA** SwaggerÄ± aÃ§
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();           // JSON endpoint’ini etkinleþtirir
-    app.UseSwaggerUI(c =>       // UI’ý "/swagger" yoluna baðlar
+    app.UseSwagger();           // JSON endpointÄ±nÄ± etkinleÅŸtirir
+    app.UseSwaggerUI(c =>       // UIÄ± "/swagger" yoluna baÅŸlar
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "HealthTracker.API v1");
-        // Ýstersen rota prefix'ini deðiþtir
-        // c.RoutePrefix = string.Empty; // UI'ý root ("/") altýna taþýr
+        // Ä°stersen rota prefix'ini deÄŸiÅŸtir
+        // c.RoutePrefix = string.Empty; // UI'Ä± root ("/") altÄ±na taÅŸÄ±r
     });
 }
 
@@ -110,7 +121,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 
-// **ÖNCE** Authenticate
+// **Ã–NCE** Authenticate
 app.UseAuthentication();
 // **SONRA** Authorize
 app.UseAuthorization();

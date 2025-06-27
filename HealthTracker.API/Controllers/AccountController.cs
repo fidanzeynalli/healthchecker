@@ -31,7 +31,7 @@ namespace HealthTracker.API.Controllers
         {
             var user = new ApplicationUser
             {
-                UserName = dto.UserName,
+                UserName = dto.Email,
                 Email = dto.Email,
                 FullName = dto.FullName,
                 Height = dto.Height,
@@ -83,6 +83,31 @@ namespace HealthTracker.API.Controllers
                 expiry = expires
             });
         }
+
+        [HttpGet("profile")]
+        [Microsoft.AspNetCore.Authorization.Authorize]
+        public async Task<IActionResult> GetProfile()
+        {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                return Unauthorized();
+
+            var user = await _userMgr.FindByIdAsync(userId);
+            if (user == null)
+                return NotFound();
+
+            return Ok(new
+            {
+                user.FullName,
+                user.Email,
+                user.Height,
+                user.Weight,
+                user.BodyFat,
+                user.UserName,
+                user.Id
+                // user.CreatedAt // Eğer ApplicationUser modelinde varsa ekle
+            });
+        }
     }
 
     // DTO'lar
@@ -90,7 +115,6 @@ namespace HealthTracker.API.Controllers
     {
         public string FullName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
-        public string UserName { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
         public double? Height { get; set; }
         public double? Weight { get; set; }

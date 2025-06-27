@@ -4,16 +4,15 @@ namespace HealthTracker.API.Models
 {
     public class FoodItem
     {
+        [Key]
         public int Id { get; set; }
         [Required]
-        public string Name { get; set; } = string.Empty;
-        public string? Brand { get; set; }
-        public int Calories { get; set; }
-        public int Carbs { get; set; }
-        public int Fat { get; set; }
-        public int Protein { get; set; }
-        public int Sodium { get; set; }
-        public int Sugar { get; set; }
-        public string? UserId { get; set; } // Kişisel gıdalar için
+        public required string Name { get; set; }
+        public int CaloriesPerServing { get; set; }
+        public double Carb { get; set; }
+        public double Fat { get; set; }
+        public double Protein { get; set; }
+        public required string ServingSize { get; set; } // ör: "100g", "1 porsiyon"
+        public string? UserId { get; set; } // null ise global, dolu ise kişisel
     }
 } 

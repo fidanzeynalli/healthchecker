@@ -5,6 +5,8 @@ using HealthTracker.API.Data;
 using HealthTracker.API.Models;
 using System.Linq;
 using System.Threading.Tasks;
+using HealthTracker.API.Services;
+using System.Security.Claims;
 
 namespace HealthTracker.API.Controllers
 {
@@ -14,9 +16,11 @@ namespace HealthTracker.API.Controllers
     public class MealsController : ControllerBase
     {
         private readonly AppDbContext _context;
-        public MealsController(AppDbContext context)
+        private readonly IMealService _mealService;
+        public MealsController(AppDbContext context, IMealService mealService)
         {
             _context = context;
+            _mealService = mealService;
         }
 
         // GET: api/Meals
@@ -36,13 +40,23 @@ namespace HealthTracker.API.Controllers
             return Ok(meal);
         }
 
+        // GET: api/Meals/by-date
+        [HttpGet("by-date")]
+        public async Task<IActionResult> GetByDate([FromQuery] string date)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!DateTime.TryParse(date, out var dt)) return BadRequest("Invalid date");
+            var meals = await _mealService.GetMealsByDateAsync(dt, userId);
+            return Ok(meals);
+        }
+
         // POST: api/Meals
         [HttpPost]
-        public async Task<IActionResult> Create(Meal meal)
+        public async Task<IActionResult> Create([FromBody] Meal meal)
         {
-            _context.Meals.Add(meal);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(Get), new { id = meal.Id }, meal);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var created = await _mealService.AddMealAsync(meal, userId);
+            return CreatedAtAction(nameof(Get), new { id = created.Id }, created);
         }
 
         // PUT: api/Meals/5

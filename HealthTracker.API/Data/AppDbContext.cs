@@ -24,5 +24,7 @@ namespace HealthTracker.API.Data
         public DbSet<Meal> Meals { get; set; }
         public DbSet<MealItem> MealItems { get; set; }
         public DbSet<Exercise> Exercises { get; set; }
+        public DbSet<DailyLog> DailyLogs { get; set; }
+        public DbSet<WaterLog> WaterLogs { get; set; }
     }
 }

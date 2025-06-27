@@ -6,11 +6,13 @@ namespace HealthTracker.API.Models
 {
     public class Meal
     {
+        [Key]
         public int Id { get; set; }
         [Required]
-        public string Name { get; set; } = string.Empty;
-        public string UserId { get; set; } = string.Empty;
-        public DateTime Date { get; set; }
-        public List<MealItem> Items { get; set; } = new();
+        public required string UserId { get; set; }
+        [Required]
+        public required string Name { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public List<MealItem> Items { get; set; } = new List<MealItem>();
     }
 } 
