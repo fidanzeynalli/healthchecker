@@ -88,7 +88,15 @@ namespace HealthTracker.API.Controllers
         [Microsoft.AspNetCore.Authorization.Authorize]
         public async Task<IActionResult> GetProfile()
         {
+            var authHeader = Request.Headers["Authorization"].ToString();
+            Console.WriteLine("Gelen Authorization: '" + authHeader + "'");
+            Console.WriteLine("Authorization Header Uzunluğu: " + authHeader.Length);
+            Console.WriteLine("Authorization Header Boş mu: " + string.IsNullOrEmpty(authHeader));
+
+            // Giriş yapan kullanıcının ID'sini al
             var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            Console.WriteLine("Çözümlenen UserId: " + userId);
+
             if (userId == null)
                 return Unauthorized();
 
@@ -107,6 +115,13 @@ namespace HealthTracker.API.Controllers
                 user.Id
                 // user.CreatedAt // Eğer ApplicationUser modelinde varsa ekle
             });
+        }
+
+        [HttpGet("cors-test")]
+        [Microsoft.AspNetCore.Authorization.AllowAnonymous]
+        public IActionResult CorsTest()
+        {
+            return Ok("CORS OK!");
         }
     }
 

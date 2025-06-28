@@ -6,9 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-
-
-
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,7 +37,7 @@ var key = Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]!);
     })
     .AddJwtBearer(options =>
     {
-        options.RequireHttpsMetadata = true;
+        options.RequireHttpsMetadata = false;
         options.SaveToken = true;
         options.TokenValidationParameters = new TokenValidationParameters
         {
@@ -51,16 +49,23 @@ var key = Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]!);
             IssuerSigningKey = new SymmetricSecurityKey(key),
             ValidateIssuerSigningKey = true
         };
+        options.Events = new JwtBearerEvents
+        {
+            OnAuthenticationFailed = context =>
+            {
+                Console.WriteLine("JWT Hatası: " + context.Exception.Message);
+                return Task.CompletedTask;
+            }
+        };
     });
 
 // 4) CORS (isteğe bağlı, frontend'in erişimi için)
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll",
-        policy => policy
-            .AllowAnyOrigin()
-            .AllowAnyHeader()
-            .AllowAnyMethod()
+    options.AddDefaultPolicy(policy =>
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod()
     );
 });
 
@@ -117,14 +122,18 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-// Pipeline
+app.UseCors(); // EN ÜSTTE!
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.All
+});
 app.UseHttpsRedirection();
-app.UseCors("AllowAll");
 
-// **ÖNCE** Authenticate
-app.UseAuthentication();
-// **SONRA** Authorize
-app.UseAuthorization();
+app.UseWhen(context => context.Request.Path.StartsWithSegments("/api"), appBuilder =>
+{
+    appBuilder.UseAuthentication();
+    appBuilder.UseAuthorization();
+});
 
 app.MapControllers();
 
