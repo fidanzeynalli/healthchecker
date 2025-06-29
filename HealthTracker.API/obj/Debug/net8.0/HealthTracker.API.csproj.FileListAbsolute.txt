@@ -2,8 +2,8 @@ C:\Users\Fidan\Desktop\internet_programlama_git\HealthTracker.API\bin\Debug\net8
 C:\Users\Fidan\Desktop\internet_programlama_git\HealthTracker.API\bin\Debug\net8.0\appsettings.json
 C:\Users\Fidan\Desktop\internet_programlama_git\HealthTracker.API\bin\Debug\net8.0\package-lock.json
 C:\Users\Fidan\Desktop\internet_programlama_git\HealthTracker.API\bin\Debug\net8.0\package.json
+C:\Users\Fidan\Desktop\internet_programlama_git\HealthTracker.API\bin\Debug\net8.0\HealthTracker.API.staticwebassets.runtime.json
 C:\Users\Fidan\Desktop\internet_programlama_git\HealthTracker.API\bin\Debug\net8.0\HealthTracker.API.staticwebassets.endpoints.json
-C:\Users\Fidan\Desktop\internet_programlama_git\HealthTracker.API\bin\Debug\net8.0\HealthTracker.API.exe
 C:\Users\Fidan\Desktop\internet_programlama_git\HealthTracker.API\bin\Debug\net8.0\HealthTracker.API.deps.json
 C:\Users\Fidan\Desktop\internet_programlama_git\HealthTracker.API\bin\Debug\net8.0\HealthTracker.API.runtimeconfig.json
 C:\Users\Fidan\Desktop\internet_programlama_git\HealthTracker.API\bin\Debug\net8.0\HealthTracker.API.dll

@@ -20,9 +20,9 @@ namespace HealthTracker.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get([FromQuery] string date)
+        public IActionResult Get([FromQuery] string date)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new InvalidOperationException("UserId bulunamadı");
             if (!DateTime.TryParse(date, out var dt)) return BadRequest("Invalid date");
             var log = _context.DailyLogs.FirstOrDefault(l => l.UserId == userId && l.Date == dt.Date);
             if (log == null)

@@ -21,7 +21,7 @@ namespace HealthTracker.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] int amountMl)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new InvalidOperationException("UserId bulunamadı");
             var log = await _waterService.AddWaterLogAsync(amountMl, DateTime.UtcNow, userId);
             return Ok(log);
         }
@@ -29,7 +29,7 @@ namespace HealthTracker.API.Controllers
         [HttpGet]
         public async Task<IActionResult> Get([FromQuery] string date)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new InvalidOperationException("UserId bulunamadı");
             if (!DateTime.TryParse(date, out var dt)) return BadRequest("Invalid date");
             var total = await _waterService.GetWaterConsumedAsync(dt, userId);
             return Ok(new { date = dt, waterConsumed = total });

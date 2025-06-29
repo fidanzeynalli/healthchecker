@@ -5,6 +5,8 @@ using HealthTracker.API.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authorization;
+using HealthTracker.API.Data;
 
 namespace HealthTracker.API.Controllers
 {
@@ -15,34 +17,76 @@ namespace HealthTracker.API.Controllers
         private readonly UserManager<ApplicationUser> _userMgr;
         private readonly SignInManager<ApplicationUser> _signInMgr;
         private readonly IConfiguration _config;
+        private readonly AppDbContext _context;
 
         public AccountController(
             UserManager<ApplicationUser> userMgr,
             SignInManager<ApplicationUser> signInMgr,
-            IConfiguration config)
+            IConfiguration config,
+            AppDbContext context)
         {
             _userMgr = userMgr;
             _signInMgr = signInMgr;
             _config = config;
+            _context = context;
         }
 
         [HttpPost("register")]
+        [AllowAnonymous]
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
-            var user = new ApplicationUser
-            {
-                UserName = dto.Email,
-                Email = dto.Email,
-                FullName = dto.FullName,
-                Height = dto.Height,
-                Weight = dto.Weight,
-                BodyFat = dto.BodyFat
-            };
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (dto.Password != dto.ConfirmPassword)
+                return BadRequest(new { Errors = new[] { "Şifreler eşleşmiyor." } });
+
+            var user = new ApplicationUser { UserName = dto.Email, Email = dto.Email };
             var result = await _userMgr.CreateAsync(user, dto.Password);
             if (!result.Succeeded)
-                return BadRequest(result.Errors);
+            {
+                var errors = result.Errors.Select(e => e.Description).ToArray();
+                return BadRequest(new { Errors = errors });
+            }
 
-            return Ok(new { Message = "Kayıt başarılı." });
+            // Profile creation
+            var profile = new Profile
+            {
+                UserId = user.Id,
+                FirstName = dto.FirstName,
+                LastName = dto.LastName,
+                Email = dto.Email,
+                Age = dto.Age,
+                Weight = dto.Weight,
+                Height = dto.Height,
+                PhotoUrl = "" // Boş string atanıyor, null değil
+            };
+            _context.Profiles.Add(profile);
+            await _context.SaveChangesAsync();
+
+            // JWT Token
+            var jwtSettings = _config.GetSection("JwtSettings");
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["SecretKey"] ?? jwtSettings["Key"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var expires = DateTime.UtcNow.AddMinutes(60);
+            var claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Email!),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.Id)
+            };
+            var token = new JwtSecurityToken(
+                issuer: jwtSettings["Issuer"],
+                audience: jwtSettings["Audience"],
+                claims: claims,
+                expires: expires,
+                signingCredentials: creds
+            );
+            return Ok(new
+            {
+                token = new JwtSecurityTokenHandler().WriteToken(token),
+                expiry = expires
+            });
         }
 
         [HttpPost("login")]
@@ -50,11 +94,11 @@ namespace HealthTracker.API.Controllers
         {
             var user = await _userMgr.FindByEmailAsync(dto.Email);
             if (user == null)
-                return Unauthorized();
+                return Unauthorized(new { Error = "Email veya şifre hatalı." });
 
             var result = await _signInMgr.CheckPasswordSignInAsync(user, dto.Password, false);
             if (!result.Succeeded)
-                return Unauthorized();
+                return Unauthorized(new { Error = "Email veya şifre hatalı." });
 
             // JWT Token oluştur
             var jwtSettings = _config.GetSection("JwtSettings");
@@ -128,9 +172,12 @@ namespace HealthTracker.API.Controllers
     // DTO'lar
     public class RegisterDto
     {
-        public string FullName { get; set; } = string.Empty;
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
+        public string ConfirmPassword { get; set; } = string.Empty;
+        public int Age { get; set; }
         public double? Height { get; set; }
         public double? Weight { get; set; }
         public double? BodyFat { get; set; }

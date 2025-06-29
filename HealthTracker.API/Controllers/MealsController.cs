@@ -44,7 +44,7 @@ namespace HealthTracker.API.Controllers
         [HttpGet("by-date")]
         public async Task<IActionResult> GetByDate([FromQuery] string date)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new InvalidOperationException("UserId bulunamadı");
             if (!DateTime.TryParse(date, out var dt)) return BadRequest("Invalid date");
             var meals = await _mealService.GetMealsByDateAsync(dt, userId);
             return Ok(meals);
@@ -54,7 +54,7 @@ namespace HealthTracker.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] Meal meal)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new InvalidOperationException("UserId bulunamadı");
             var created = await _mealService.AddMealAsync(meal, userId);
             return CreatedAtAction(nameof(Get), new { id = created.Id }, created);
         }

@@ -14,63 +14,60 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
-    {
-    options.Password.RequireDigit = true;
-    options.Password.RequireUppercase = true;
-    options.Password.RequiredLength = 6;
-    // Diğer identity ayarları...
-    })
-    .AddEntityFrameworkStores<AppDbContext>()
-    .AddDefaultTokenProviders();
+builder.Services.AddIdentityCore<ApplicationUser>(options => { /* password etc. */ })
+    .AddSignInManager()
+    .AddEntityFrameworkStores<AppDbContext>();
 
-// 2) JWT Ayarlarını Oku
-var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-Console.WriteLine("JWT SecretKey: " + jwtSettings["SecretKey"]);
-var key = Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]!);
-
-// 3) Authentication & JWT Bearer
-    builder.Services.AddAuthentication(options =>
-    {
+// 2) JWT-only authentication
+builder.Services.AddAuthentication(options =>
+{
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer(options =>
-    {
-        options.RequireHttpsMetadata = false;
-        options.SaveToken = true;
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidIssuer = jwtSettings["Issuer"],
-            ValidateAudience = true,
-            ValidAudience = jwtSettings["Audience"],
-            ValidateLifetime = true,
-            IssuerSigningKey = new SymmetricSecurityKey(key),
-            ValidateIssuerSigningKey = true
-        };
-        options.Events = new JwtBearerEvents
-        {
-            OnAuthenticationFailed = context =>
-            {
-                Console.WriteLine("JWT Hatası: " + context.Exception.Message);
-                return Task.CompletedTask;
-            }
-        };
-    });
-
-// 4) CORS (isteğe bağlı, frontend'in erişimi için)
-builder.Services.AddCors(options =>
+})
+.AddJwtBearer(options =>
 {
-    options.AddDefaultPolicy(policy =>
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-    );
+    var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings["Issuer"],
+        ValidAudience = jwtSettings["Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["SecretKey"] ?? jwtSettings["Key"]))
+    };
+    options.Events = new JwtBearerEvents
+    {
+        OnChallenge = context =>
+        {
+            context.HandleResponse();
+            context.Response.StatusCode = 401;
+            return Task.CompletedTask;
+        },
+        OnForbidden = context =>
+        {
+            context.Response.StatusCode = 403;
+            return Task.CompletedTask;
+        }
+    };
 });
+builder.Services.AddAuthorization();
+
+// CORS for React frontend
+builder.Services.AddCors(o => o.AddPolicy("AllowReact",
+  p => p.WithOrigins("http://localhost:3001")
+        .AllowAnyHeader()
+        .AllowAnyMethod()));
+
+builder.Services.AddCors(o =>
+  o.AddPolicy("AllowAll", p => p.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
 
 // 5) Controllerları ekle, Swagger
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+});
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(c =>
@@ -110,10 +107,29 @@ builder.Services.AddScoped<HealthTracker.API.Services.IMealService, HealthTracke
 builder.Services.AddScoped<HealthTracker.API.Services.IWaterService, HealthTracker.API.Services.WaterService>();
 
 var app = builder.Build();
+
+app.UseStaticFiles(); // For wwwroot/uploads
+
+app.UseRouting();
+
+app.UseCors("AllowReact");
+app.UseCors("AllowAll");
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.All
+});
+// app.UseHttpsRedirection();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
+
 // **SADECE GELİŞTİRME ORTAMINDA** Swaggerı aç
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();           // JSON endpointını etkinleştirir
+    app.UseDeveloperExceptionPage();
+    app.UseSwagger();
     app.UseSwaggerUI(c =>       // UIı "/swagger" yoluna başlar
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "HealthTracker.API v1");
@@ -121,20 +137,5 @@ if (app.Environment.IsDevelopment())
         // c.RoutePrefix = string.Empty; // UI'ı root ("/") altına taşır
     });
 }
-
-app.UseCors(); // EN ÜSTTE!
-app.UseForwardedHeaders(new ForwardedHeadersOptions
-{
-    ForwardedHeaders = ForwardedHeaders.All
-});
-app.UseHttpsRedirection();
-
-app.UseWhen(context => context.Request.Path.StartsWithSegments("/api"), appBuilder =>
-{
-    appBuilder.UseAuthentication();
-    appBuilder.UseAuthorization();
-});
-
-app.MapControllers();
 
 app.Run();

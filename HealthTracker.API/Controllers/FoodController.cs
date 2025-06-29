@@ -4,6 +4,7 @@ using HealthTracker.API.Services;
 using HealthTracker.API.Models;
 using System.Threading.Tasks;
 using System.Security.Claims;
+using System;
 
 namespace HealthTracker.API.Controllers
 {
@@ -21,7 +22,7 @@ namespace HealthTracker.API.Controllers
         [HttpGet]
         public async Task<IActionResult> Search([FromQuery] string query)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new InvalidOperationException("UserId bulunamadı");
             var foods = await _foodService.SearchFoodsAsync(query, userId);
             return Ok(foods);
         }
@@ -29,7 +30,7 @@ namespace HealthTracker.API.Controllers
         [HttpGet("personal")]
         public async Task<IActionResult> GetPersonalFoods()
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new InvalidOperationException("UserId bulunamadı");
             var foods = await _foodService.GetPersonalFoodsAsync(userId);
             return Ok(foods);
         }
@@ -37,7 +38,7 @@ namespace HealthTracker.API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new InvalidOperationException("UserId bulunamadı");
             var food = await _foodService.GetFoodByIdAsync(id, userId);
             if (food == null) return NotFound();
             return Ok(food);
@@ -46,7 +47,7 @@ namespace HealthTracker.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] FoodItem food)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new InvalidOperationException("UserId bulunamadı");
             var created = await _foodService.AddFoodAsync(food, userId);
             return CreatedAtAction(nameof(Get), new { id = created.Id }, created);
         }
